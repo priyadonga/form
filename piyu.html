@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Validation with Success Message</title>
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Red border for empty fields */
+        .error-border {
+            border: 2px solid red;
+        }
+
+        /* Style for the error message */
+        .error-message {
+            color: red;
+            font-size: 12px;
+            display: none; /* Initially hidden */
+        }
+
+        /* Style for the success message */
+        .success-message {
+            color: green;
+            font-size: 14px;
+            display: none; /* Initially hidden */
+        }
+    </style>
+</head>
+<body>
+    <!-- Form with inputs for name, email, phone, and message -->
+    <form id="myForm">
+        <div>
+            <input type="text" id="name" name="name" placeholder="Name">
+            <!-- Error message for name -->
+            <div class="error-message" id="nameError">This field is required.</div>
+        </div>
+        <br>
+        <div>
+            <input type="email" id="email" name="email" placeholder="Email">
+            <!-- Error message for email -->
+            <div class="error-message" id="emailError">This field is required.</div>
+        </div>
+        <br>
+        <div>
+            <input type="number" id="phone" name="phone" placeholder="Phone Number">
+            <!-- Error message for phone -->
+            <div class="error-message" id="phoneError">This field is required.</div>
+        </div>
+        <br>
+        <div>
+            <textarea id="message" name="message" placeholder="Message"></textarea>
+            <!-- Error message for message -->
+            <div class="error-message" id="messageError">This field is required.</div>
+        </div>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <!-- Placeholder to display the success message -->
+    <div class="success-message" id="successMessage">Form submitted successfully!</div>
+
+    <!-- jQuery Script -->
+    <script>
+        $(document).ready(function() {
+            // Handle form submission
+            $('#myForm').on('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
+                
+                // Clear previous error styles and messages
+                $('#name, #email, #phone, #message').removeClass('error-border');
+                $('#nameError, #emailError, #phoneError, #messageError').hide();
+                $('#successMessage').hide(); // Hide success message initially
+
+                // Get the values from form inputs
+                let name = $('#name').val().trim();
+                let email = $('#email').val().trim();
+                let phone = $('#phone').val().trim();
+                let message = $('#message').val().trim();
+                let isValid = true;
+
+                // Check if name input is empty
+                if (name === "") {
+                    $('#name').addClass('error-border'); // Add red border if empty
+                    $('#nameError').show(); // Show the error message
+                    isValid = false;
+                }
+
+                // Check if email input is empty
+                if (email === "") {
+                    $('#email').addClass('error-border'); // Add red border if empty
+                    $('#emailError').show(); // Show the error message
+                    isValid = false;
+                }
+
+                // Check if phone input is empty
+                if (phone === "") {
+                    $('#phone').addClass('error-border'); // Add red border if empty
+                    $('#phoneError').show(); // Show the error message
+                    isValid = false;
+                }
+
+                // Check if message input is empty
+                if (message === "") {
+                    $('#message').addClass('error-border'); // Add red border if empty
+                    $('#messageError').show(); // Show the error message
+                    isValid = false;
+                }
+
+                // If form is valid, display the success message
+                if (isValid) {
+                    $('#successMessage').show(); // Show the success message
+                    $('#result').html(`
+                        <p>Name: ${name}</p>
+                        <p>Email: ${email}</p>
+                        <p>Phone: ${phone}</p>
+                        <p>Message: ${message}</p>
+                    `);
+                    $('#myForm')[0].reset(); // Optionally reset the form
+                }
+            });
+
+            // Handle real-time input change for all fields
+            $('#name, #email, #phone, #message').on('input', function() {
+                // Remove red border and hide error message when user starts typing again
+                $(this).removeClass('error-border');
+                $(this).siblings('.error-message').hide();
+            });
+        });
+    </script>
+</body>
+</html>
