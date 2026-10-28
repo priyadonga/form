@@ -1,132 +1,220 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Validation with Success Message</title>
-    <!-- jQuery CDN -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        /* Red border for empty fields */
-        .error-border {
-            border: 2px solid red;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form with Make Automation</title>
 
-        /* Style for the error message */
-        .error-message {
-            color: red;
-            font-size: 12px;
-            display: none; /* Initially hidden */
-        }
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-        /* Style for the success message */
-        .success-message {
-            color: green;
-            font-size: 14px;
-            display: none; /* Initially hidden */
-        }
-    </style>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    input, textarea {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      margin-top: 5px;
+    }
+
+    textarea {
+      min-height: 100px;
+    }
+
+    .error-border {
+      border: 2px solid red;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 12px;
+      display: none;
+    }
+
+    .success-message,
+    .error-status {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 5px;
+    }
+
+    .success-message {
+      color: #176b35;
+      background: #e6f6eb;
+    }
+
+    .error-status {
+      color: #b42318;
+      background: #feeceb;
+    }
+
+    button {
+      padding: 12px 22px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
+
 <body>
-    <!-- Form with inputs for name, email, phone, and message -->
-    <form id="myForm">
-        <div>
-            <input type="text" id="name" name="name" placeholder="Name">
-            <!-- Error message for name -->
-            <div class="error-message" id="nameError">This field is required.</div>
-        </div>
-        <br>
-        <div>
-            <input type="email" id="email" name="email" placeholder="Email">
-            <!-- Error message for email -->
-            <div class="error-message" id="emailError">This field is required.</div>
-        </div>
-        <br>
-        <div>
-            <input type="number" id="phone" name="phone" placeholder="Phone Number">
-            <!-- Error message for phone -->
-            <div class="error-message" id="phoneError">This field is required.</div>
-        </div>
-        <br>
-        <div>
-            <textarea id="message" name="message" placeholder="Message"></textarea>
-            <!-- Error message for message -->
-            <div class="error-message" id="messageError">This field is required.</div>
-        </div>
-        <br>
-        <input type="submit" value="Submit">
-    </form>
 
-    <!-- Placeholder to display the success message -->
-    <div class="success-message" id="successMessage">Form submitted successfully!</div>
+  <h2>Contact Form</h2>
 
-    <!-- jQuery Script -->
-    <script>
-        $(document).ready(function() {
-            // Handle form submission
-            $('#myForm').on('submit', function(event) {
-                event.preventDefault(); // Prevent default form submission
-                
-                // Clear previous error styles and messages
-                $('#name, #email, #phone, #message').removeClass('error-border');
-                $('#nameError, #emailError, #phoneError, #messageError').hide();
-                $('#successMessage').hide(); // Hide success message initially
+  <form id="myForm">
+    <div>
+      <input type="text" id="name" name="name"
+        placeholder="Name" required>
+      <div class="error-message" id="nameError">
+        Name is required.
+      </div>
+    </div>
+    <br>
 
-                // Get the values from form inputs
-                let name = $('#name').val().trim();
-                let email = $('#email').val().trim();
-                let phone = $('#phone').val().trim();
-                let message = $('#message').val().trim();
-                let isValid = true;
+    <div>
+      <input type="email" id="email" name="email"
+        placeholder="Email" required>
+      <div class="error-message" id="emailError">
+        Enter a valid email address.
+      </div>
+    </div>
+    <br>
 
-                // Check if name input is empty
-                if (name === "") {
-                    $('#name').addClass('error-border'); // Add red border if empty
-                    $('#nameError').show(); // Show the error message
-                    isValid = false;
-                }
+    <div>
+      <input type="tel" id="phone" name="phone"
+        placeholder="Phone Number" required>
+      <div class="error-message" id="phoneError">
+        Phone number is required.
+      </div>
+    </div>
+    <br>
 
-                // Check if email input is empty
-                if (email === "") {
-                    $('#email').addClass('error-border'); // Add red border if empty
-                    $('#emailError').show(); // Show the error message
-                    isValid = false;
-                }
+    <div>
+      <textarea id="message" name="message"
+        placeholder="Message" required></textarea>
+      <div class="error-message" id="messageError">
+        Message is required.
+      </div>
+    </div>
+    <br>
 
-                // Check if phone input is empty
-                if (phone === "") {
-                    $('#phone').addClass('error-border'); // Add red border if empty
-                    $('#phoneError').show(); // Show the error message
-                    isValid = false;
-                }
+    <button type="submit" id="submitButton">
+      Submit
+    </button>
+  </form>
 
-                // Check if message input is empty
-                if (message === "") {
-                    $('#message').addClass('error-border'); // Add red border if empty
-                    $('#messageError').show(); // Show the error message
-                    isValid = false;
-                }
+  <div class="success-message" id="successMessage" role="status">
+    Form submitted successfully!
+  </div>
 
-                // If form is valid, display the success message
-                if (isValid) {
-                    $('#successMessage').show(); // Show the success message
-                    $('#result').html(`
-                        <p>Name: ${name}</p>
-                        <p>Email: ${email}</p>
-                        <p>Phone: ${phone}</p>
-                        <p>Message: ${message}</p>
-                    `);
-                    $('#myForm')[0].reset(); // Optionally reset the form
-                }
-            });
+  <div class="error-status" id="errorMessage" role="alert">
+    Submission failed. Please try again.
+  </div>
 
-            // Handle real-time input change for all fields
-            $('#name, #email, #phone, #message').on('input', function() {
-                // Remove red border and hide error message when user starts typing again
-                $(this).removeClass('error-border');
-                $(this).siblings('.error-message').hide();
-            });
-        });
-    </script>
+  <script>
+    const WEBHOOK_URL =
+      "https://hook.eu2.make.com/17kh9jkjgob256jb2g5325n9cenq7v3i";
+
+    $(function () {
+      const $form = $("#myForm");
+
+      $form.on("submit", async function (event) {
+        event.preventDefault();
+
+        $("#successMessage, #errorMessage").hide();
+        $(".error-message").hide();
+        $("input, textarea").removeClass("error-border");
+
+        const name = $("#name").val().trim();
+        const email = $("#email").val().trim();
+        const phone = $("#phone").val().trim();
+        const message = $("#message").val().trim();
+
+        let valid = true;
+
+        function showError(field, errorId) {
+          $(field).addClass("error-border");
+          $(errorId).show();
+          valid = false;
+        }
+
+        if (!name) {
+          showError("#name", "#nameError");
+        }
+
+        if (!email || !$("#email")[0].checkValidity()) {
+          showError("#email", "#emailError");
+        }
+
+        if (!phone) {
+          showError("#phone", "#phoneError");
+        }
+
+        if (!message) {
+          showError("#message", "#messageError");
+        }
+
+        if (!valid) return;
+
+        const $button = $("#submitButton");
+        $button.prop("disabled", true).text("Submitting...");
+
+        try {
+          const formData = new URLSearchParams({
+            name,
+            email,
+            phone,
+            message
+          });
+
+          const response = await fetch(WEBHOOK_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData.toString()
+          });
+
+          if (!response.ok) {
+            throw new Error("Webhook request failed");
+          }
+
+          const result = await response.text();
+
+          if (result.trim().toLowerCase() !== "success") {
+            throw new Error("Make did not confirm completion");
+          }
+
+          $("#successMessage").show();
+          $form[0].reset();
+
+        } catch (error) {
+          console.error("Form submission error:", error);
+          $("#errorMessage").text(
+            "Submission could not be confirmed. Please try again."
+          ).show();
+
+        } finally {
+          $button.prop("disabled", false).text("Submit");
+        }
+      });
+
+      $("input, textarea").on("input", function () {
+        $(this).removeClass("error-border");
+        $(this).siblings(".error-message").hide();
+      });
+    });
+  </script>
+
 </body>
 </html>
