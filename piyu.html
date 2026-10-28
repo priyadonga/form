@@ -1,12 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Form with Make Automation</title>
-
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <title>Contact Form - Make Automation</title>
 
   <style>
     body {
@@ -37,8 +34,7 @@
       display: none;
     }
 
-    .success-message,
-    .error-status {
+    .status {
       display: none;
       margin-top: 15px;
       padding: 12px;
@@ -68,7 +64,6 @@
 </head>
 
 <body>
-
   <h2>Contact Form</h2>
 
   <form id="myForm">
@@ -108,16 +103,14 @@
     </div>
     <br>
 
-    <button type="submit" id="submitButton">
-      Submit
-    </button>
+    <button type="submit" id="submitButton">Submit</button>
   </form>
 
-  <div class="success-message" id="successMessage" role="status">
+  <div class="status success-message" id="successMessage" role="status">
     Form submitted successfully!
   </div>
 
-  <div class="error-status" id="errorMessage" role="alert">
+  <div class="status error-status" id="errorMessage" role="alert">
     Submission failed. Please try again.
   </div>
 
@@ -125,96 +118,102 @@
     const WEBHOOK_URL =
       "https://hook.eu2.make.com/17kh9jkjgob256jb2g5325n9cenq7v3i";
 
-    $(function () {
-      const $form = $("#myForm");
+    const form = document.getElementById("myForm");
+    const button = document.getElementById("submitButton");
 
-      $form.on("submit", async function (event) {
-        event.preventDefault();
+    const successMessage = document.getElementById("successMessage");
+    const errorMessage = document.getElementById("errorMessage");
 
-        $("#successMessage, #errorMessage").hide();
-        $(".error-message").hide();
-        $("input, textarea").removeClass("error-border");
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
 
-        const name = $("#name").val().trim();
-        const email = $("#email").val().trim();
-        const phone = $("#phone").val().trim();
-        const message = $("#message").val().trim();
+      successMessage.style.display = "none";
+      errorMessage.style.display = "none";
 
-        let valid = true;
+      document.querySelectorAll(".error-message").forEach(el => {
+        el.style.display = "none";
+      });
 
-        function showError(field, errorId) {
-          $(field).addClass("error-border");
-          $(errorId).show();
+      document.querySelectorAll("#myForm input, #myForm textarea")
+        .forEach(el => el.classList.remove("error-border"));
+
+      let valid = true;
+
+      const fields = [
+        ["name", "nameError"],
+        ["email", "emailError"],
+        ["phone", "phoneError"],
+        ["message", "messageError"]
+      ];
+
+      fields.forEach(([fieldId, errorId]) => {
+        const field = document.getElementById(fieldId);
+
+        if (!field.value.trim() || !field.checkValidity()) {
+          field.classList.add("error-border");
+          document.getElementById(errorId).style.display = "block";
           valid = false;
         }
-
-        if (!name) {
-          showError("#name", "#nameError");
-        }
-
-        if (!email || !$("#email")[0].checkValidity()) {
-          showError("#email", "#emailError");
-        }
-
-        if (!phone) {
-          showError("#phone", "#phoneError");
-        }
-
-        if (!message) {
-          showError("#message", "#messageError");
-        }
-
-        if (!valid) return;
-
-        const $button = $("#submitButton");
-        $button.prop("disabled", true).text("Submitting...");
-
-        try {
-          const formData = new URLSearchParams({
-            name,
-            email,
-            phone,
-            message
-          });
-
-          const response = await fetch(WEBHOOK_URL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: formData.toString()
-          });
-
-          if (!response.ok) {
-            throw new Error("Webhook request failed");
-          }
-
-          const result = await response.text();
-
-          if (result.trim().toLowerCase() !== "success") {
-            throw new Error("Make did not confirm completion");
-          }
-
-          $("#successMessage").show();
-          $form[0].reset();
-
-        } catch (error) {
-          console.error("Form submission error:", error);
-          $("#errorMessage").text(
-            "Submission could not be confirmed. Please try again."
-          ).show();
-
-        } finally {
-          $button.prop("disabled", false).text("Submit");
-        }
       });
 
-      $("input, textarea").on("input", function () {
-        $(this).removeClass("error-border");
-        $(this).siblings(".error-message").hide();
-      });
+      if (!valid) return;
+
+      button.disabled = true;
+      button.textContent = "Submitting...";
+
+      try {
+        const formData = new URLSearchParams(
+          new FormData(form)
+        );
+
+        const response = await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+          },
+          body: formData.toString()
+        });
+
+        if (!response.ok) {
+          throw new Error("HTTP status " + response.status);
+        }
+
+        const result = (await response.text()).trim();
+
+        console.log("Make response:", response.status, result);
+
+        // Make Webhook Response module should return HTTP 200
+        // after the required automation steps have completed.
+        // JSON, HTML, or empty responses are not treated as failure.
+        successMessage.style.display = "block";
+        form.reset();
+
+      } catch (error) {
+        console.error("Form submission error:", error);
+
+        errorMessage.textContent =
+          "We couldn't confirm the submission. Please check your connection or contact us.";
+
+        errorMessage.style.display = "block";
+
+      } finally {
+        button.disabled = false;
+        button.textContent = "Submit";
+      }
     });
-  </script>
 
+    document.querySelectorAll("#myForm input, #myForm textarea")
+      .forEach(field => {
+        field.addEventListener("input", function () {
+          this.classList.remove("error-border");
+
+          const error = document.getElementById(this.id + "Error");
+
+          if (error) {
+            error.style.display = "none";
+          }
+        });
+      });
+  </script>
 </body>
 </html>
